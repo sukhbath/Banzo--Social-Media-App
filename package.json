@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/sukhbath/Banzo--Social-Media-App#readme",
   "dependencies": {
+    "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "mongoose": "^5.10.3",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "password-validator": "^5.1.0"
   }
 }
