@@ -15,7 +15,7 @@ ConnectDb(
 app.use(express.json());
 
 app.use("/api/v1/users", UserRoute);
-// app.use("/api/v1/posts", PostRoute);
+app.use("/api/v1/posts", PostRoute);
 
 app.use(ErrorController);
 

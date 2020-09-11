@@ -1,5 +1,4 @@
 const express = require("express");
-// const UserModel = require("./../Models/USER_MODEL");
 const CatchError = require("./../Utils/CatchError");
 
 exports.createDoc = (Model) =>
