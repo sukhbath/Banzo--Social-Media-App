@@ -24,8 +24,9 @@ var PostSchema = new mongoose.Schema({
   // likes: [mongoose.Types.ObjectId], in user section
 });
 
-PostSchema.pre(/^find/, async function (a) {
-  await this.populate({ path: "users", select: "username" });
+PostSchema.pre(/^find/, async function (next) {
+  this.populate({ path: "user", select: "username" });
+  next();
 });
 
 var PostModel = mongoose.model("posts", PostSchema);
