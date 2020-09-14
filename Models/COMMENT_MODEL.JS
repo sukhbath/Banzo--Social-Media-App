@@ -18,13 +18,12 @@ var CommentSchema = new mongoose.Schema({
     required: [true, "Must provide post associated to the comment."],
   },
   dateModified: { type: Date },
-  // likes: [mongoose.Types.ObjectId], in user section
 });
 
 CommentSchema.pre(/^find/, async function (next) {
-  this.populate({ path: "user", select: "username" });
+  this.populate({ path: "post", select: "caption" });
   next();
 });
 
-var CommentModel = mongoose.model("comments", comment);
+var CommentModel = mongoose.model("comments", CommentSchema);
 module.exports = CommentModel;
