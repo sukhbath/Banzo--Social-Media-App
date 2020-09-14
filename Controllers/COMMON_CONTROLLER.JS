@@ -13,7 +13,7 @@ exports.createDoc = (Model) =>
 
 exports.getDocs = (Model) =>
   CatchError(async function (req, res, next) {
-    var allDocs = await Model.find();
+    var allDocs = await Model.find(req.body.filterObj);
     res.status(200).send({
       status: "success",
       length: allDocs.length,

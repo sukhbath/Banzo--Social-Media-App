@@ -21,7 +21,10 @@ var CommentSchema = new mongoose.Schema({
 });
 
 CommentSchema.pre(/^find/, async function (next) {
-  this.populate({ path: "post", select: "caption" });
+  this.populate({ path: "post", select: "caption" }).populate({
+    path: "user",
+    select: "username",
+  });
   next();
 });
 

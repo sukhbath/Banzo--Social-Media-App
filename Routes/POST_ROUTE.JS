@@ -12,6 +12,6 @@ router
   .patch(PostController.updatePost)
   .delete(PostController.deletePost);
 
-router.use("/:id/comments", CommentRoute);
+router.use("/:post/comments", CommentRoute);
 
 module.exports = router;
