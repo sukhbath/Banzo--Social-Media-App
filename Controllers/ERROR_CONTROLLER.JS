@@ -10,6 +10,8 @@ var ErrorController = function (error, req, res, next) {
     sendError = enumError(error);
   } else if (error._message == "users validation failed") {
     sendError = validationError(error);
+  } else {
+    sendError = error;
   }
   console.log(error);
   res.status(400).send({

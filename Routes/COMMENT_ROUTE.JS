@@ -1,6 +1,10 @@
 const express = require("express");
 var CommentController = require("./../Controllers/COMMENT_CONTROLLER");
+const AuntheticationController = require("./../Controllers/AUTHENTICATION_CONTTOLLER");
+
 var router = express.Router({ mergeParams: true });
+
+router.use(AuntheticationController.protectedRoute);
 
 router
   .route("/")

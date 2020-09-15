@@ -1,16 +1,15 @@
 const express = require("express");
 const app = express();
+const dotenv = require("dotenv");
 const ConnectDb = require("./Utils/ConnectDb");
 const ErrorController = require("./Controllers/ERROR_CONTROLLER");
 const UserRoute = require("./Routes/USER_ROUTE");
 const PostRoute = require("./Routes/POST_ROUTE");
 const UserModel = require("./Models/USER_MODEL");
-
 var UserController = require("./Controllers/USER_CONTROLLER");
+dotenv.config();
 
-ConnectDb(
-  "mongodb+srv://sukh:sukh@cluster0-7nszg.mongodb.net/Banzo?retryWrites=true&w=majority"
-);
+ConnectDb(process.env.DB_URL);
 
 app.use(express.json());
 
