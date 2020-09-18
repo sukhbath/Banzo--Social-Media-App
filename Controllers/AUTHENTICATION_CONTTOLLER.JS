@@ -4,6 +4,7 @@ const UserModel = require("./../Models/USER_MODEL");
 var passwordHash = require("password-hash");
 var jwt = require("jsonwebtoken");
 const CustomError = require("../Utils/CustomError");
+var utils = require("util");
 const Email = require("./../Utils/Email");
 
 function SendToken(res, user, message, statusCode) {
@@ -75,6 +76,12 @@ exports.protectedRoute = CatchError(async function (req, res, next) {
   } else {
     token = req.cookies.jwt;
   }
+  if (!token) return next(new CustomError("Please login to get access."));
+  var varify = utils.promisify(jwt.verify);
+  var data = await varify("token", process.env.SALT_KEY);
+
+  // var user = await UserModel.findById(data.id);
+  // if (!user) return next(new CustomError("User doesn't exist now."));
 
   next();
 });

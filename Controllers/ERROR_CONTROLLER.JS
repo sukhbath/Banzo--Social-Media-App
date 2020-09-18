@@ -10,6 +10,10 @@ var ErrorController = function (error, req, res, next) {
     sendError = enumError(error);
   } else if (error._message == "users validation failed") {
     sendError = validationError(error);
+  } else if (error.name == "JsonWebTokenError") {
+    sendError = IvalidJwtError(error);
+  } else if (error.name == "TokenExpiredError") {
+    sendError = IvalidJwtError(error);
   } else {
     sendError = error;
   }
@@ -38,6 +42,16 @@ function validationError(error) {
 
 function enumError(error) {
   message = `Invalid value for ${error.message.split(":")[1].trim()}`;
+  return new CustomError(message);
+}
+
+function IvalidJwtError(error) {
+  message = `Invalid token`;
+  return new CustomError(message);
+}
+
+function IvalidJwtError(error) {
+  message = `Session expired, login again.`;
   return new CustomError(message);
 }
 
