@@ -7,6 +7,7 @@ exports.createDoc = (Model) =>
     newDoc.password = undefined;
     res.status(201).send({
       status: "success",
+      message: "document created",
       data: newDoc,
     });
   });
@@ -39,6 +40,7 @@ exports.updateDoc = (Model) =>
     });
     res.status(200).send({
       status: "success",
+      message: "document updated",
       data: updatedDoc,
     });
   });
@@ -48,5 +50,6 @@ exports.deleteDoc = (Model) =>
     var deletedDoc = await Model.findByIdAndDelete(req.params.id);
     res.status(204).send({
       status: "success",
+      message: "document deleted",
     });
   });

@@ -17,8 +17,8 @@ var ErrorController = function (error, req, res, next) {
   } else {
     sendError = error;
   }
-  console.log(error);
-  res.status(400).send({
+  // console.log(error);
+  res.status(sendError.statusCode).send({
     status: "fail",
     message: sendError.message,
     error,
@@ -29,7 +29,7 @@ function duplicateError(error) {
   for (const key in error.keyValue) {
     message = `${key}: ${error.keyValue[key]} already exists`;
   }
-  return new CustomError(message);
+  return new CustomError(message, 400);
 }
 
 function validationError(error) {
@@ -37,22 +37,22 @@ function validationError(error) {
     message = `${error.errors[key].message}. `;
     break;
   }
-  return new CustomError(message);
+  return new CustomError(message, 400);
 }
 
 function enumError(error) {
   message = `Invalid value for ${error.message.split(":")[1].trim()}`;
-  return new CustomError(message);
+  return new CustomError(message, 400);
 }
 
 function IvalidJwtError(error) {
   message = `Invalid token`;
-  return new CustomError(message);
+  return new CustomError(message, 400);
 }
 
 function IvalidJwtError(error) {
   message = `Session expired, login again.`;
-  return new CustomError(message);
+  return new CustomError(message, 400);
 }
 
 module.exports = ErrorController;
