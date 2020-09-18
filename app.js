@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
+var cookieParser = require("cookie-parser");
 const ConnectDb = require("./Utils/ConnectDb");
 const ErrorController = require("./Controllers/ERROR_CONTROLLER");
 const UserRoute = require("./Routes/USER_ROUTE");
@@ -12,6 +13,7 @@ dotenv.config();
 ConnectDb(process.env.DB_URL);
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/v1/users", UserRoute);
 app.use("/api/v1/posts", PostRoute);

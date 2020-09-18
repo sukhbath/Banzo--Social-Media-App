@@ -6,7 +6,7 @@ exports.createDoc = (Model) =>
     var newDoc = await Model.create(req.body);
     newDoc.password = undefined;
     res.status(201).send({
-      status: "created",
+      status: "success",
       data: newDoc,
     });
   });

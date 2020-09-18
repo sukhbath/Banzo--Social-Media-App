@@ -60,6 +60,8 @@ var UserSchema = new mongoose.Schema({
       message: (obj) => `Password does not matches`,
     },
   },
+  pswdChngdAt: Date,
+  tempPassword: String,
 });
 
 UserSchema.pre("save", function (next) {
