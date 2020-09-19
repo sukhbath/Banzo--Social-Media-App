@@ -17,8 +17,8 @@ var ErrorController = function (error, req, res, next) {
   } else {
     sendError = error;
   }
-  // console.log(error);
-  res.status(sendError.statusCode).send({
+  console.log(error);
+  res.status(sendError.statusCode || 500).send({
     status: "fail",
     message: sendError.message,
     error,
@@ -45,12 +45,12 @@ function enumError(error) {
   return new CustomError(message, 400);
 }
 
-function IvalidJwtError(error) {
+function IvalidJwtError() {
   message = `Invalid token`;
   return new CustomError(message, 401);
 }
 
-function TokenExpiredError(error) {
+function TokenExpiredError() {
   message = `Session expired, login again.`;
   return new CustomError(message, 401);
 }

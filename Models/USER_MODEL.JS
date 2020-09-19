@@ -65,10 +65,17 @@ var UserSchema = new mongoose.Schema({
 });
 
 UserSchema.pre("save", function (next) {
-  this.password = passwordHash.generate(this.password);
-  this.confirmPassword = undefined;
+  if (this.isModified("password")) {
+    this.pswdChngdAt = Date.now();
+    this.password = passwordHash.generate(this.password);
+    this.confirmPassword = undefined;
+  }
   next();
 });
+
+UserSchema.methods.verifyPassword = function (password) {
+  return passwordHash.verify(password, this.password);
+};
 
 var UserModel = mongoose.model("users", UserSchema);
 module.exports = UserModel;

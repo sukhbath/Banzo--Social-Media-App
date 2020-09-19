@@ -6,7 +6,6 @@ var jwt = require("jsonwebtoken");
 const CustomError = require("../Utils/CustomError");
 var utils = require("util");
 const Email = require("./../Utils/Email");
-// const { use } = require("../Routes/USER_ROUTE");
 
 function SendToken(res, user, message, statusCode) {
   var token = jwt.sign({ id: user.id }, process.env.SALT_KEY, {
@@ -26,31 +25,29 @@ exports.login = CatchError(async function (req, res, next) {
   var { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new CustomError("Must provide email and password."));
+    return next(new CustomError("Must provide email and password.", 400));
   }
 
   var user = await UserModel.findOne({ email }).select("+password");
 
   if (!user) {
-    return next(new CustomError("User does not exists with provided email."));
+    return next(
+      new CustomError("User does not exists with provided email.", 400)
+    );
   }
 
-  if (!passwordHash.verify(password, user.password)) {
-    next(new CustomError("Must provide correct password to login."));
+  if (!user.verifyPassword(password, user.password)) {
+    next(new CustomError("Must provide correct password to login.", 400));
   }
+
   SendToken(res, user, "Logged in Successfully", 200);
 
-  Email(
-    newUser.email,
-    newUser.firstName + "Welcome again",
-    "Logged in Successfully"
-  );
+  Email(user.email, user.firstName + "Welcome again", "Logged in Successfully");
 });
 
 exports.signup = CatchError(async function (req, res, next) {
   var newUser = await UserModel.create(req.body);
   var token = jwt.sign({ id: newUser.id }, process.env.SALT_KEY);
-  res.cookie("jwt", token);
   SendToken(res, newUser, "Signed up Successfully", 201);
   Email(
     newUser.email,
@@ -59,16 +56,29 @@ exports.signup = CatchError(async function (req, res, next) {
   );
 });
 
-// exports.updatePassword = CatchError(async function (req, res, next) {
-//   var user = await UserModel.findById(req.body.email);
-//   if (!user) return next(new CustomError("User not found"));
-//   if (!passwordHash.verify(password, user.password)) {
-//     next(new CustomError("Must provide correct password to login."));
-//   }
+exports.updatePassword = CatchError(async function (req, res, next) {
+  var { oldPassword, newPassword, confirmPassword } = req.body;
 
-//   res.cookie("jwt", token);
-//   SendToken(res, newUser, "Signed up Successfully", 200);
-// });
+  if (!oldPassword || !newPassword || !confirmPassword)
+    return next(new CustomError("Must provide all fields."));
+
+  var user = await UserModel.findById(req.user.id).select("+password");
+
+  if (!user) return next(new CustomError("User not found"));
+
+  if (!(await user.verifyPassword(oldPassword))) {
+    return next(
+      new CustomError("Must provide correct password to update password.", 400)
+    );
+  }
+  user.password = newPassword;
+  user.confirmPassword = confirmPassword;
+  await user.save();
+
+  SendToken(res, user, "password updated Successfully", 200);
+
+  next();
+});
 
 exports.protectedRoute = CatchError(async function (req, res, next) {
   var token;
@@ -87,9 +97,11 @@ exports.protectedRoute = CatchError(async function (req, res, next) {
   var user = await UserModel.findById(data.id);
 
   if (!user) return next(new CustomError("User doesn't exist now."));
-
-  if (data.iat * 1000 > user.pswdChngdAt * 1)
-    return next(new CustomError("User has changed the password.", 401));
+  console.log(data.iat * 1000, user.pswdChngdAt * 1);
+  if (data.iat * 1000 < user.pswdChngdAt * 1)
+    return next(
+      new CustomError("User has changed the password, login again.", 401)
+    );
 
   req.user = user;
   next();

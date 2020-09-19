@@ -10,11 +10,16 @@ router.route("/").get(UserController.getUsers).post(UserController.createUser);
 
 router.post("/signup", AuntheticationController.signup);
 router.post("/login", AuntheticationController.login);
+router.patch(
+  "/updatePassword",
+  AuntheticationController.protectedRoute,
+  AuntheticationController.updatePassword
+);
 
 router
   .route("/:id")
   .get(UserController.getUser)
-  .patch(UserController.updateUser)
-  .delete(UserController.deleteUser);
+  .patch(AuntheticationController.protectedRoute, UserController.updateUser)
+  .delete(AuntheticationController.protectedRoute, UserController.deleteUser);
 
 module.exports = router;
