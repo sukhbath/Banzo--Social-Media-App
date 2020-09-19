@@ -33,8 +33,15 @@ exports.getDoc = (Model) =>
 
 exports.updateDoc = (Model) =>
   CatchError(async function (req, res, next) {
-    var { username, email, firstName, lastName, age, gender } = req.body;
-    var newInfo = { username, email, firstName, lastName, age, gender };
+    // var { username, email, firstName, lastName, age, gender } = req.body;
+    // var newInfo = { username, email, firstName, lastName, age, gender };
+
+    var newInfo = { ...req.body };
+    ["password", "confirmPassword", "pswdChngdAt", "tempPassword"].forEach(
+      (v) => {
+        delete newInfo[v];
+      }
+    );
     var updatedDoc = await Model.findByIdAndUpdate(req.params.id, newInfo, {
       new: true,
     });

@@ -13,7 +13,7 @@ var ErrorController = function (error, req, res, next) {
   } else if (error.name == "JsonWebTokenError") {
     sendError = IvalidJwtError(error);
   } else if (error.name == "TokenExpiredError") {
-    sendError = IvalidJwtError(error);
+    sendError = TokenExpiredError(error);
   } else {
     sendError = error;
   }
@@ -47,12 +47,12 @@ function enumError(error) {
 
 function IvalidJwtError(error) {
   message = `Invalid token`;
-  return new CustomError(message, 400);
+  return new CustomError(message, 401);
 }
 
-function IvalidJwtError(error) {
+function TokenExpiredError(error) {
   message = `Session expired, login again.`;
-  return new CustomError(message, 400);
+  return new CustomError(message, 401);
 }
 
 module.exports = ErrorController;

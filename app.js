@@ -21,5 +21,5 @@ app.use("/api/v1/posts", PostRoute);
 app.use(ErrorController);
 
 app.listen(3000, function () {
-  console.log("Server has been started at 3000\n");
+  console.log("\nServer has been started at 3000\n");
 });

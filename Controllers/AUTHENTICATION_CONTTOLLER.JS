@@ -6,10 +6,11 @@ var jwt = require("jsonwebtoken");
 const CustomError = require("../Utils/CustomError");
 var utils = require("util");
 const Email = require("./../Utils/Email");
+// const { use } = require("../Routes/USER_ROUTE");
 
 function SendToken(res, user, message, statusCode) {
   var token = jwt.sign({ id: user.id }, process.env.SALT_KEY, {
-    expiresIn: "100000",
+    expiresIn: "10d",
   });
   user.password = undefined;
   res.cookie("jwt", token);
@@ -58,13 +59,16 @@ exports.signup = CatchError(async function (req, res, next) {
   );
 });
 
-exports.updatePassword = CatchError(async function (req, res, next) {
-  var user = await UserModel.findOne(req.body.email);
-  if (!user) return next(new CustomError("User not found"));
+// exports.updatePassword = CatchError(async function (req, res, next) {
+//   var user = await UserModel.findById(req.body.email);
+//   if (!user) return next(new CustomError("User not found"));
+//   if (!passwordHash.verify(password, user.password)) {
+//     next(new CustomError("Must provide correct password to login."));
+//   }
 
-  res.cookie("jwt", token);
-  SendToken(res, newUser, "Signed up Successfully", 200);
-});
+//   res.cookie("jwt", token);
+//   SendToken(res, newUser, "Signed up Successfully", 200);
+// });
 
 exports.protectedRoute = CatchError(async function (req, res, next) {
   var token;
@@ -76,12 +80,17 @@ exports.protectedRoute = CatchError(async function (req, res, next) {
   } else {
     token = req.cookies.jwt;
   }
-  if (!token) return next(new CustomError("Please login to get access."));
+  if (!token) return next(new CustomError("Please login to get access.", 401));
   var varify = utils.promisify(jwt.verify);
-  var data = await varify("token", process.env.SALT_KEY);
+  var data = await varify(token, process.env.SALT_KEY);
 
-  // var user = await UserModel.findById(data.id);
-  // if (!user) return next(new CustomError("User doesn't exist now."));
+  var user = await UserModel.findById(data.id);
 
+  if (!user) return next(new CustomError("User doesn't exist now."));
+
+  if (data.iat * 1000 > user.pswdChngdAt * 1)
+    return next(new CustomError("User has changed the password.", 401));
+
+  req.user = user;
   next();
 });
