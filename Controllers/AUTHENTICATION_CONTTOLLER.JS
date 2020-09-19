@@ -107,6 +107,7 @@ exports.resetPassword = CatchError(async function (req, res, next) {
     tempPassword,
     tempPasswordTime: { $gte: Date.now() },
   });
+
   if (!user) return next(new CustomError("User not found"));
 
   user.password = newPassword;
