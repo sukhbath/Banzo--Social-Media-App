@@ -15,6 +15,8 @@ router.patch(
   AuntheticationController.protectedRoute,
   AuntheticationController.updatePassword
 );
+router.get("/forgetPassword", AuntheticationController.forgetPassword);
+router.post("/resetPassword", AuntheticationController.resetPassword);
 
 router
   .route("/:id")

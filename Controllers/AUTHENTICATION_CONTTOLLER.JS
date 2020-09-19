@@ -80,6 +80,50 @@ exports.updatePassword = CatchError(async function (req, res, next) {
   next();
 });
 
+exports.forgetPassword = CatchError(async function (req, res, next) {
+  var { email } = req.body;
+  if (!email) {
+    return next(new CustomError("Must provide email.", 400));
+  }
+  var user = await UserModel.findOne({ email });
+  if (!user) return next(new CustomError("User not found"));
+
+  var tempPassword = await user.createTempPaswd();
+
+  res.send({
+    status: "success",
+    tempPassword,
+  });
+
+  next();
+});
+
+exports.resetPassword = CatchError(async function (req, res, next) {
+  var { tempPassword, newPassword, confirmPassword } = req.body;
+  if (!tempPassword || !newPassword || !confirmPassword) {
+    return next(new CustomError("Must provide all fields.", 400));
+  }
+  var user = await UserModel.findOne({
+    tempPassword,
+    tempPasswordTime: { $gte: Date.now() },
+  });
+  if (!user) return next(new CustomError("User not found"));
+
+  user.password = newPassword;
+  user.confirmPassword = confirmPassword;
+
+  user.tempPassword = undefined;
+  user.tempPasswordTime = undefined;
+  await user.save();
+
+  res.send({
+    status: "success",
+    message: "Password updated successfully",
+  });
+
+  next();
+});
+
 exports.protectedRoute = CatchError(async function (req, res, next) {
   var token;
   if (

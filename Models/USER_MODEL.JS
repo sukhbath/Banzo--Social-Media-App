@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 var emailValidator = require("email-validator");
 var validators = require("./../Utils/Validators");
 var passwordHash = require("password-hash");
+var generator = require("generate-password");
 
 var UserSchema = new mongoose.Schema({
   username: {
@@ -60,8 +61,16 @@ var UserSchema = new mongoose.Schema({
       message: (obj) => `Password does not matches`,
     },
   },
-  pswdChngdAt: Date,
+  tempPassword: {
+    type: String,
+    select: false,
+  },
+  tempPasswordTime: {
+    type: Date,
+    select: false,
+  },
   tempPassword: String,
+  pswdChngdAt: Date,
 });
 
 UserSchema.pre("save", function (next) {
@@ -75,6 +84,17 @@ UserSchema.pre("save", function (next) {
 
 UserSchema.methods.verifyPassword = function (password) {
   return passwordHash.verify(password, this.password);
+};
+
+UserSchema.methods.createTempPaswd = async function () {
+  var tempPassword = generator.generate({
+    length: 7,
+    numbers: true,
+  });
+  this.tempPassword = tempPassword;
+  this.tempPasswordTime = Date.now() + 60 * 10 * 1000;
+  await this.save();
+  return tempPassword;
 };
 
 var UserModel = mongoose.model("users", UserSchema);
